@@ -1,18 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Task Management Tool</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+
+        .table-container {
+            max-height: 400px; /* Set the maximum height for the container */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px; /* Adjust the padding as needed */
+            text-align: left;
+            border: 1px solid black;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        th {
+            background-color: #6BC8F1;
+            color: black;
+        }
+
+    </style>
 </head>
 <body>
     <h1>Welcome to My Task Management Tool</h1>
+
+    <!-- Filter inputs -->
     
+    <h2>All Tasks</h2>
+        <input type="text" id="taskIdInput" placeholder="Task ID">
+        <input type="text" id="titleInput" placeholder="Title">
+        <input type="text" id="descriptionInput" placeholder="Description">
+        <input type="text" id="dueDateInput" placeholder="Due Date">
+        <button onclick="searchTable()">Search</button>
+
+    <div class="table-container">
+        <table id="taskTable">
+            <tr>
+                <th>Task ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Due Date</th>
+            </tr>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description }}</td>
+                <td>{{ task.due_date }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+
     <h2>Menu:</h2>
     <ul>
         <li><a href="/create">Create task</a></li>
         <li><a href="/view">View tasks</a></li>
         <li><a href="/update">Update task</a></li>
         <li><a href="/delete">Delete task</a></li>
-        <li><a href="/view-archived">View archived tasks</a></li>
     </ul>
+
+    <!-- JavaScript for filtering -->
+    <script>
+        function searchTable() {
+            var inputFields, table, rows, filterValues;
+
+            // Get all input fields
+            inputFields = document.querySelectorAll("input[type=text]");
+
+            // Get table, rows, and convert input field values to uppercase
+            table = document.getElementById("taskTable");
+            rows = table.getElementsByTagName("tr");
+            filterValues = Array.from(inputFields).map(function(input) {
+                return input.value.trim().toUpperCase(); // Trim the input value
+            });
+
+            // Loop through each table row
+            for (var i = 1; i < rows.length; i++) {
+                var row = rows[i];
+                var cells = row.getElementsByTagName("td");
+                var visible = true; // Set visible to true initially
+
+                // Loop through each cell in the row
+                for (var j = 0; j < cells.length; j++) {
+                    var cell = cells[j];
+                    var text = cell.textContent || cell.innerText;
+
+                    // If filter value is not empty, check if the cell content contains it
+                    if (filterValues[j] !== '' && text.toUpperCase().indexOf(filterValues[j]) === -1) {
+                        visible = false; // If not, set visible to false
+                        break; // Break the inner loop
+                    }
+                }
+
+                // Toggle row visibility based on search result
+                row.style.display = visible ? "" : "none";
+            }
+        }
+    </script>
 </body>
 </html>
